@@ -1,4 +1,4 @@
-import scala.slick.codegen.SourceCodeGenerator
+import slick.codegen.SourceCodeGenerator
 
 object Generator {
 
