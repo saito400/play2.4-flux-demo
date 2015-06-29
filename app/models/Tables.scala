@@ -14,7 +14,7 @@ trait Tables {
   import slick.jdbc.{GetResult => GR}
 
   /** DDL for all tables. Call .create to execute. */
-  lazy val schema = SchemaVersion.schema ++ Todo.schema
+  lazy val schema = SchemaVersion.schema ++ Todo.schema ++ TodoType.schema
   @deprecated("Use .schema instead of .ddl", "3.0")
   def ddl = schema
 
@@ -79,30 +79,62 @@ trait Tables {
 
   /** Entity class storing rows of table Todo
    *  @param id Database column id SqlType(INT), AutoInc, PrimaryKey
+   *  @param todoTypeId Database column todo_type_id SqlType(INT), Default(None)
    *  @param content Database column content SqlType(VARCHAR), Length(255,true)
-   *  @param insDatetime Database column INS_DATETIME SqlType(DATETIME)
-   *  @param updDatetime Database column UPD_DATETIME SqlType(DATETIME) */
-  case class TodoRow(id: Int, content: String, insDatetime: java.sql.Timestamp, updDatetime: java.sql.Timestamp)
+   *  @param insDatetime Database column ins_datetime SqlType(DATETIME)
+   *  @param updDatetime Database column upd_datetime SqlType(DATETIME) */
+  case class TodoRow(id: Int, todoTypeId: Option[Int] = None, content: String, insDatetime: java.sql.Timestamp, updDatetime: java.sql.Timestamp)
   /** GetResult implicit for fetching TodoRow objects using plain SQL queries */
-  implicit def GetResultTodoRow(implicit e0: GR[Int], e1: GR[String], e2: GR[java.sql.Timestamp]): GR[TodoRow] = GR{
+  implicit def GetResultTodoRow(implicit e0: GR[Int], e1: GR[Option[Int]], e2: GR[String], e3: GR[java.sql.Timestamp]): GR[TodoRow] = GR{
     prs => import prs._
-    TodoRow.tupled((<<[Int], <<[String], <<[java.sql.Timestamp], <<[java.sql.Timestamp]))
+    TodoRow.tupled((<<[Int], <<?[Int], <<[String], <<[java.sql.Timestamp], <<[java.sql.Timestamp]))
   }
   /** Table description of table todo. Objects of this class serve as prototypes for rows in queries. */
   class Todo(_tableTag: Tag) extends Table[TodoRow](_tableTag, "todo") {
-    def * = (id, content, insDatetime, updDatetime) <> (TodoRow.tupled, TodoRow.unapply)
+    def * = (id, todoTypeId, content, insDatetime, updDatetime) <> (TodoRow.tupled, TodoRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(id), Rep.Some(content), Rep.Some(insDatetime), Rep.Some(updDatetime)).shaped.<>({r=>import r._; _1.map(_=> TodoRow.tupled((_1.get, _2.get, _3.get, _4.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+    def ? = (Rep.Some(id), todoTypeId, Rep.Some(content), Rep.Some(insDatetime), Rep.Some(updDatetime)).shaped.<>({r=>import r._; _1.map(_=> TodoRow.tupled((_1.get, _2, _3.get, _4.get, _5.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
 
     /** Database column id SqlType(INT), AutoInc, PrimaryKey */
     val id: Rep[Int] = column[Int]("id", O.AutoInc, O.PrimaryKey)
+    /** Database column todo_type_id SqlType(INT), Default(None) */
+    val todoTypeId: Rep[Option[Int]] = column[Option[Int]]("todo_type_id", O.Default(None))
     /** Database column content SqlType(VARCHAR), Length(255,true) */
     val content: Rep[String] = column[String]("content", O.Length(255,varying=true))
-    /** Database column INS_DATETIME SqlType(DATETIME) */
-    val insDatetime: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("INS_DATETIME")
-    /** Database column UPD_DATETIME SqlType(DATETIME) */
-    val updDatetime: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("UPD_DATETIME")
+    /** Database column ins_datetime SqlType(DATETIME) */
+    val insDatetime: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("ins_datetime")
+    /** Database column upd_datetime SqlType(DATETIME) */
+    val updDatetime: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("upd_datetime")
   }
   /** Collection-like TableQuery object for table Todo */
   lazy val Todo = new TableQuery(tag => new Todo(tag))
+
+  /** Entity class storing rows of table TodoType
+   *  @param id Database column id SqlType(INT), AutoInc, PrimaryKey
+   *  @param title Database column title SqlType(VARCHAR), Length(255,true)
+   *  @param insDatetime Database column ins_datetime SqlType(DATETIME)
+   *  @param updDatetime Database column upd_datetime SqlType(DATETIME) */
+  case class TodoTypeRow(id: Int, title: String, insDatetime: java.sql.Timestamp, updDatetime: java.sql.Timestamp)
+  /** GetResult implicit for fetching TodoTypeRow objects using plain SQL queries */
+  implicit def GetResultTodoTypeRow(implicit e0: GR[Int], e1: GR[String], e2: GR[java.sql.Timestamp]): GR[TodoTypeRow] = GR{
+    prs => import prs._
+    TodoTypeRow.tupled((<<[Int], <<[String], <<[java.sql.Timestamp], <<[java.sql.Timestamp]))
+  }
+  /** Table description of table todo_type. Objects of this class serve as prototypes for rows in queries. */
+  class TodoType(_tableTag: Tag) extends Table[TodoTypeRow](_tableTag, "todo_type") {
+    def * = (id, title, insDatetime, updDatetime) <> (TodoTypeRow.tupled, TodoTypeRow.unapply)
+    /** Maps whole row to an option. Useful for outer joins. */
+    def ? = (Rep.Some(id), Rep.Some(title), Rep.Some(insDatetime), Rep.Some(updDatetime)).shaped.<>({r=>import r._; _1.map(_=> TodoTypeRow.tupled((_1.get, _2.get, _3.get, _4.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+
+    /** Database column id SqlType(INT), AutoInc, PrimaryKey */
+    val id: Rep[Int] = column[Int]("id", O.AutoInc, O.PrimaryKey)
+    /** Database column title SqlType(VARCHAR), Length(255,true) */
+    val title: Rep[String] = column[String]("title", O.Length(255,varying=true))
+    /** Database column ins_datetime SqlType(DATETIME) */
+    val insDatetime: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("ins_datetime")
+    /** Database column upd_datetime SqlType(DATETIME) */
+    val updDatetime: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("upd_datetime")
+  }
+  /** Collection-like TableQuery object for table TodoType */
+  lazy val TodoType = new TableQuery(tag => new TodoType(tag))
 }
