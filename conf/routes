@@ -10,5 +10,7 @@ GET     /assets/*file               controllers.Assets.versioned(path="/public",
 
 GET     /todo/index                           controllers.todo.TodoController.index
 
+GET     /todo/list                           controllers.todo.TodoController.list
+
 
 

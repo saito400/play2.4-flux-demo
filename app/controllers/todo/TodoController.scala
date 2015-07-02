@@ -12,7 +12,7 @@ import play.api.mvc.Controller
 import slick.driver.JdbcProfile
 import models.Tables
 import models.Tables._
-
+import scala.concurrent.Future
 
 //class TodoController extends Controller with Tables with HasDatabaseConfig[JdbcProfile]{
 class TodoController extends Controller with HasDatabaseConfig[JdbcProfile]{
@@ -25,7 +25,11 @@ class TodoController extends Controller with HasDatabaseConfig[JdbcProfile]{
   val Todos = TableQuery[models.Tables.Todo]
 
   def index = Action.async {
-    db.run(Todos.result).map(res => Ok(views.html.todo.index(res.toList)))
+    Future(Ok(views.html.todo.index()))
+  }
+
+  def list = Action.async {
+    db.run(Todos.result).map(res => Ok(views.html.todo.list(res.toList)))
   }
 
 }
