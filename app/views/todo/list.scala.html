@@ -7,6 +7,12 @@
 
     todo index
 
+    <form action="/todo/insert" method="POST">
+      <input name="todoTypeId" type="text" placeholder="todoTypeId" />
+      <input name="content" type="text" placeholder="content" />
+      <input type="submit"/>
+    </form>
+
     <table>
       <tr><th>Name</th><th>Color</th></tr>
       @for(t <- todos){ 

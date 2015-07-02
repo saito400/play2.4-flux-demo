@@ -4,6 +4,8 @@ import play.api.Play
 import play.api.data.Form
 import play.api.data.Forms.mapping
 import play.api.data.Forms.text
+import play.api.data.Forms.number
+import play.api.data.Forms.optional
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.db.slick.HasDatabaseConfig
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
@@ -20,8 +22,6 @@ class TodoController extends Controller with HasDatabaseConfig[JdbcProfile]{
   val dbConfig = DatabaseConfigProvider.get[JdbcProfile](Play.current)
   import driver.api._
 
-//  case class Todo(id: Int, todoTypeId: Option[Int] = None, content: String)
-
   val Todos = TableQuery[models.Tables.Todo]
 
   def index = Action.async {
@@ -30,6 +30,21 @@ class TodoController extends Controller with HasDatabaseConfig[JdbcProfile]{
 
   def list = Action.async {
     db.run(Todos.result).map(res => Ok(views.html.todo.list(res.toList)))
+  }
+  
+
+  case class Todo(todoTypeId: Option[Int] = None, content: String)
+
+  val todoForm = Form(
+    mapping(
+      "todoTypeId" -> optional(number),
+      "content" -> text()
+    )(Todo.apply)(Todo.unapply)
+  )
+
+  def insert = Action.async { implicit rs =>
+    val todo = todoForm.bindFromRequest.get
+      db.run(Todos += TodoRow(0, todo.todoTypeId, todo.content, new java.sql.Timestamp(System.currentTimeMillis), new java.sql.Timestamp(System.currentTimeMillis))).map(_ => Redirect(routes.TodoController.list))
   }
 
 }
