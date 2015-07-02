@@ -7,5 +7,12 @@
 
     todo index
 
+    <table>
+      <tr><th>Name</th><th>Color</th></tr>
+      @for(t <- todos){ 
+      <tr><td>@t.id</td><td>@t.content</td></tr>
+      }
+    </table>
+
 }
 
