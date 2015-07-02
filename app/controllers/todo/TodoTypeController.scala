@@ -21,14 +21,14 @@ class TodoTypeController extends Controller with HasDatabaseConfig[JdbcProfile]{
   val dbConfig = DatabaseConfigProvider.get[JdbcProfile](Play.current)
   import driver.api._
 
-  val TodoTypes = TableQuery[models.Tables.TodoType]
+  val todoTypes = TableQuery[models.Tables.TodoType]
 
   def index = Action.async {
     Future(Ok(views.html.todotype.index()))
   }
 
   def list = Action.async {
-    db.run(TodoTypes.result).map(res => Ok(views.html.todotype.list(res.toList)))
+    db.run(todoTypes.result).map(res => Ok(views.html.todotype.list(res.toList)))
   }
 
   case class TodoType(title: String)
@@ -41,7 +41,7 @@ class TodoTypeController extends Controller with HasDatabaseConfig[JdbcProfile]{
 
   def insert = Action.async { implicit rs =>
     val todoType = todoTypeForm.bindFromRequest.get
-      db.run(TodoTypes += TodoTypeRow(0, todoType.title, new java.sql.Timestamp(System.currentTimeMillis), new java.sql.Timestamp(System.currentTimeMillis))).map(_ => Redirect(routes.TodoTypeController.list))
+      db.run(todoTypes += TodoTypeRow(0, todoType.title, new java.sql.Timestamp(System.currentTimeMillis), new java.sql.Timestamp(System.currentTimeMillis))).map(_ => Redirect(routes.TodoTypeController.list))
   }
 
 }
