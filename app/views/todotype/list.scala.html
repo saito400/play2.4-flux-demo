@@ -1,0 +1,23 @@
+@import models.Tables._
+
+@(todotypes: List[TodoTypeRow])
+
+
+@main("index") {
+
+    todo type list
+
+    <form action="/todotype/insert" method="POST">
+      <input name="title" type="text" placeholder="title" />
+      <input type="submit"/>
+    </form>
+
+    <table>
+      <tr><th>Name</th><th>Color</th></tr>
+      @for(t <- todotypes){ 
+      <tr><td>@t.id</td><td>@t.title</td></tr>
+      }
+    </table>
+
+}
+

@@ -14,5 +14,11 @@ GET     /todo/list                           controllers.todo.TodoController.lis
 
 POST     /todo/insert                           controllers.todo.TodoController.insert
 
+GET     /todotype/index                           controllers.todo.TodoTypeController.index
+
+GET     /todotype/list                           controllers.todo.TodoTypeController.list
+
+POST     /todotype/insert                           controllers.todo.TodoTypeController.insert
+
 
 
