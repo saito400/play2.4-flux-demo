@@ -17,7 +17,6 @@ import models.Tables._
 import scala.concurrent.Future
 import models.TodoType
 import service.todo.TodoTypeService
-
 import javax.inject.Inject
 
 class TodoTypeController @Inject() (service: TodoTypeService) extends Controller {

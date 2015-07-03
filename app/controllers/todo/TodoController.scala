@@ -16,24 +16,19 @@ import models.Tables
 import models.Tables._
 import scala.concurrent.Future
 import models.Todo
+import service.todo.TodoService
+import javax.inject.Inject
 
-class TodoController extends Controller with HasDatabaseConfig[JdbcProfile]{
-
-  val dbConfig = DatabaseConfigProvider.get[JdbcProfile](Play.current)
-  import driver.api._
-
-  val todos = TableQuery[models.Tables.Todo]
-  val todoTypes = TableQuery[models.Tables.TodoType]
+class TodoController @Inject() (service: TodoService) extends Controller {
 
   def index = Action.async {
     Future(Ok(views.html.todo.index()))
   }
 
   def list = Action.async {
-    val todoList = for {
-      (t, tt) <- todos joinLeft todoTypes on (_.todoTypeId === _.id)
-    } yield (t.id, tt.map(_.id), t.content)
-    db.run(todoList.result).map(res => Ok(views.html.todo.list(res.toList)))
+    service.list.map { x => 
+      Ok(views.html.todo.list(x.toList))
+    }
   }
 
   val todoForm = Form(
@@ -45,7 +40,6 @@ class TodoController extends Controller with HasDatabaseConfig[JdbcProfile]{
 
   def insert = Action.async { implicit rs =>
     val todo = todoForm.bindFromRequest.get
-    db.run(todos += TodoRow(0, todo.todoTypeId, todo.content, new java.sql.Timestamp(System.currentTimeMillis), new java.sql.Timestamp(System.currentTimeMillis))).map(_ => Redirect(routes.TodoController.list))
+    service.insert(TodoRow(0, todo.todoTypeId, todo.content, new java.sql.Timestamp(System.currentTimeMillis), new java.sql.Timestamp(System.currentTimeMillis))).map(_ => Redirect(routes.TodoController.list))
   }
-
 }
