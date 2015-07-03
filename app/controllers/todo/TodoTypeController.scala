@@ -16,20 +16,20 @@ import models.Tables
 import models.Tables._
 import scala.concurrent.Future
 import models.TodoType
+import service.todo.TodoTypeService
 
-class TodoTypeController extends Controller with HasDatabaseConfig[JdbcProfile]{
+import javax.inject.Inject
 
-  val dbConfig = DatabaseConfigProvider.get[JdbcProfile](Play.current)
-  import driver.api._
-
-  val todoTypes = TableQuery[models.Tables.TodoType]
+class TodoTypeController @Inject() (service: TodoTypeService) extends Controller {
 
   def index = Action.async {
     Future(Ok(views.html.todotype.index()))
   }
 
   def list = Action.async {
-    db.run(todoTypes.result).map(res => Ok(views.html.todotype.list(res.toList)))
+    service.all.map { x => 
+      Ok(views.html.todotype.list(x.toList))
+    }
   }
 
   val todoTypeForm = Form(
@@ -40,7 +40,6 @@ class TodoTypeController extends Controller with HasDatabaseConfig[JdbcProfile]{
 
   def insert = Action.async { implicit rs =>
     val todoType = todoTypeForm.bindFromRequest.get
-      db.run(todoTypes += TodoTypeRow(0, todoType.title, new java.sql.Timestamp(System.currentTimeMillis), new java.sql.Timestamp(System.currentTimeMillis))).map(_ => Redirect(routes.TodoTypeController.list))
+    service.insert(TodoTypeRow(0, todoType.title, new java.sql.Timestamp(System.currentTimeMillis), new java.sql.Timestamp(System.currentTimeMillis))).map(_ => Redirect(routes.TodoTypeController.list))
   }
-
 }
