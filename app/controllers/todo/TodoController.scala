@@ -15,8 +15,8 @@ import slick.driver.JdbcProfile
 import models.Tables
 import models.Tables._
 import scala.concurrent.Future
+import models.Todo
 
-//class TodoController extends Controller with Tables with HasDatabaseConfig[JdbcProfile]{
 class TodoController extends Controller with HasDatabaseConfig[JdbcProfile]{
 
   val dbConfig = DatabaseConfigProvider.get[JdbcProfile](Play.current)
@@ -35,8 +35,6 @@ class TodoController extends Controller with HasDatabaseConfig[JdbcProfile]{
     } yield (t.id, tt.map(_.id), t.content)
     db.run(todoList.result).map(res => Ok(views.html.todo.list(res.toList)))
   }
-
-  case class Todo(todoTypeId: Option[Int] = None, content: String)
 
   val todoForm = Form(
     mapping(

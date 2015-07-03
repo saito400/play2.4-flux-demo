@@ -15,6 +15,7 @@ import slick.driver.JdbcProfile
 import models.Tables
 import models.Tables._
 import scala.concurrent.Future
+import models.TodoType
 
 class TodoTypeController extends Controller with HasDatabaseConfig[JdbcProfile]{
 
@@ -30,8 +31,6 @@ class TodoTypeController extends Controller with HasDatabaseConfig[JdbcProfile]{
   def list = Action.async {
     db.run(todoTypes.result).map(res => Ok(views.html.todotype.list(res.toList)))
   }
-
-  case class TodoType(title: String)
 
   val todoTypeForm = Form(
     mapping(
