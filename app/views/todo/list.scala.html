@@ -1,6 +1,6 @@
 @import models.Tables._
 
-@(todos: List[(Int, Option[Int], String)])
+@(re: (Seq[(Int, Option[Int], String)], Seq[models.Tables.TodoTypeRow]))
 
 @main("index") {
 
@@ -14,7 +14,7 @@
 
     <table>
       <tr><th>id</th><th>TodoTypeId</th><th>Content</th></tr>
-      @for(t <- todos){ 
+      @for(t <- re._1){ 
       <tr><td>@t._1</td><td>@t._2</td><td>@t._3</td></tr>
       }
     </table>

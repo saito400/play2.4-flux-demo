@@ -16,19 +16,23 @@ import models.Tables
 import models.Tables._
 import scala.concurrent.Future
 import models.Todo
-import service.todo.TodoService
+import service.todo.{TodoService, TodoTypeService}
 import javax.inject.Inject
 
-class TodoController @Inject() (service: TodoService) extends Controller {
+class TodoController @Inject() (todoService: TodoService, todoTypeService: TodoTypeService) extends Controller {
 
   def index = Action.async {
     Future(Ok(views.html.todo.index()))
   }
 
   def list = Action.async {
-    service.list.map { x => 
-      Ok(views.html.todo.list(x.toList))
+    val r = for {
+     res1 <- todoService.list
+     res2 <- todoTypeService.all
+    } yield {
+      (res1, res2)
     }
+    r.map(x => Ok(views.html.todo.list(x)))
   }
 
   val todoForm = Form(
@@ -40,6 +44,6 @@ class TodoController @Inject() (service: TodoService) extends Controller {
 
   def insert = Action.async { implicit rs =>
     val todo = todoForm.bindFromRequest.get
-    service.insert(TodoRow(0, todo.todoTypeId, todo.content, new java.sql.Timestamp(System.currentTimeMillis), new java.sql.Timestamp(System.currentTimeMillis))).map(_ => Redirect(routes.TodoController.list))
+    todoService.insert(TodoRow(0, todo.todoTypeId, todo.content, new java.sql.Timestamp(System.currentTimeMillis), new java.sql.Timestamp(System.currentTimeMillis))).map(_ => Redirect(routes.TodoController.list))
   }
 }
