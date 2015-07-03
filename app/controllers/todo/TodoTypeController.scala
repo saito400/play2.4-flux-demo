@@ -15,7 +15,6 @@ import slick.driver.JdbcProfile
 import models.Tables
 import models.Tables._
 import scala.concurrent.Future
-import models.TodoType
 import service.todo.TodoTypeService
 import javax.inject.Inject
 
