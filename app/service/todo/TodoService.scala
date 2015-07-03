@@ -20,7 +20,9 @@ class TodoService @Inject()(protected val dbConfigProvider: DatabaseConfigProvid
 
   def list(): Future[Seq[(Int, Option[Int], String)]] = {
     val todoList = for {
-      (t, tt) <- todos joinLeft todoTypes on (_.todoTypeId === _.id)
+      (t, tt) <- todos joinLeft todoTypes on(_.todoTypeId === _.id) sortBy {
+        case (t1, t2) => t1.id
+      }
     } yield (t.id, tt.map(_.id), t.content)
     db.run(todoList.result)
   }
