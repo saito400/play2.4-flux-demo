@@ -15,7 +15,6 @@ import slick.driver.JdbcProfile
 import models.Tables
 import models.Tables._
 import scala.concurrent.Future
-import models.Todo
 import service.todo.{TodoService, TodoTypeService}
 import javax.inject.Inject
 
@@ -35,11 +34,13 @@ class TodoController @Inject() (todoService: TodoService, todoTypeService: TodoT
     r.map(x => Ok(views.html.todo.list(x)))
   }
 
+  case class TodoForm(todoTypeId: Option[Int] = None, content: String)
+
   val todoForm = Form(
     mapping(
       "todoTypeId" -> optional(number),
       "content" -> text()
-    )(Todo.apply)(Todo.unapply)
+    )(TodoForm.apply)(TodoForm.unapply)
   )
 
   def insert = Action.async { implicit rs =>

@@ -31,10 +31,12 @@ class TodoTypeController @Inject() (service: TodoTypeService) extends Controller
     }
   }
 
+  case class TodoTypeForm(title: String)
+
   val todoTypeForm = Form(
     mapping(
       "title" -> text()
-    )(TodoType.apply)(TodoType.unapply)
+    )(TodoTypeForm.apply)(TodoTypeForm.unapply)
   )
 
   def insert = Action.async { implicit rs =>
