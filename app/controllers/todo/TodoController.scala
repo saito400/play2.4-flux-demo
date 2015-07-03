@@ -23,16 +23,18 @@ class TodoController extends Controller with HasDatabaseConfig[JdbcProfile]{
   import driver.api._
 
   val todos = TableQuery[models.Tables.Todo]
+  val todoTypes = TableQuery[models.Tables.TodoType]
 
   def index = Action.async {
     Future(Ok(views.html.todo.index()))
   }
 
   def list = Action.async {
-
-    db.run(todos.result).map(res => Ok(views.html.todo.list(res.toList)))
+    val todoList = for {
+      (t, tt) <- todos joinLeft todoTypes on (_.todoTypeId === _.id)
+    } yield (t.id, tt.map(_.id), t.content)
+    db.run(todoList.result).map(res => Ok(views.html.todo.list(res.toList)))
   }
-  
 
   case class Todo(todoTypeId: Option[Int] = None, content: String)
 
@@ -45,7 +47,7 @@ class TodoController extends Controller with HasDatabaseConfig[JdbcProfile]{
 
   def insert = Action.async { implicit rs =>
     val todo = todoForm.bindFromRequest.get
-      db.run(todos += TodoRow(0, todo.todoTypeId, todo.content, new java.sql.Timestamp(System.currentTimeMillis), new java.sql.Timestamp(System.currentTimeMillis))).map(_ => Redirect(routes.TodoController.list))
+    db.run(todos += TodoRow(0, todo.todoTypeId, todo.content, new java.sql.Timestamp(System.currentTimeMillis), new java.sql.Timestamp(System.currentTimeMillis))).map(_ => Redirect(routes.TodoController.list))
   }
 
 }

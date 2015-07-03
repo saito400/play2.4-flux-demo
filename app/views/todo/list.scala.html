@@ -1,7 +1,6 @@
 @import models.Tables._
 
-@(todos: List[TodoRow])
-
+@(todos: List[(Int, Option[Int], String)])
 
 @main("index") {
 
@@ -16,7 +15,7 @@
     <table>
       <tr><th>Name</th><th>TodoTypeId</th><th>Content</th></tr>
       @for(t <- todos){ 
-      <tr><td>@t.id</td><td>@t.todoTypeId</td><td>@t.content</td></tr>
+      <tr><td>@t._1</td><td>@t._2</td><td>@t._3</td></tr>
       }
     </table>
 
