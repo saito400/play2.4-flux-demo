@@ -13,10 +13,8 @@ import models.Tables._
 class TodoTypeService @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) extends HasDatabaseConfigProvider[JdbcProfile] {
   import driver.api._
 
-  private val todoTypes = TableQuery[TodoType]
+  def all(): Future[Seq[TodoTypeRow]] = db.run(TodoType.result)
 
-  def all(): Future[Seq[TodoTypeRow]] = db.run(todoTypes.result)
-
-  def insert(t: TodoTypeRow): Future[Unit] = db.run(todoTypes += t).map { _ => () }
+  def insert(t: TodoTypeRow): Future[Unit] = db.run(TodoType += t).map { _ => () }
 
 }

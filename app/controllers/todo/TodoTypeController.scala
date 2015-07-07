@@ -17,20 +17,44 @@ import models.Tables._
 import scala.concurrent.Future
 import service.todo.TodoTypeService
 import javax.inject.Inject
+import play.api.libs.json._
+import play.api.libs.functional.syntax._
+import java.sql.Timestamp
 
 class TodoTypeController @Inject() (service: TodoTypeService) extends Controller {
 
-  def index = Action.async {
-    Future(Ok(views.html.todotype.index()))
-  }
+  case class TodoTypeForm(title: String)
+  implicit val todoTypeFormat = Json.format[TodoTypeForm]
+
+  //  implicit val timeFormat = Json.format[java.sql.Timestamp]
+
+  implicit val rds: Reads[Timestamp] = (__ \ "time").read[Long].map { long => new Timestamp(long) }
+  implicit val wrs: Writes[Timestamp] = (__ \ "time").write[Long].contramap { (a: Timestamp) => a.getTime }
+  implicit val fmt: Format[Timestamp] = Format(rds, wrs)
+
+  implicit val TodoTypeRowWrites: Writes[TodoTypeRow] = (
+    (__ \ "id").write[Int] and
+    (__ \ "title").write[String] and
+    (__ \ "insDatetime").write[Timestamp] and
+    (__ \ "updDatetime").write[Timestamp]
+  )(unlift(TodoTypeRow.unapply))
+
+  implicit val TodoTypeRowReads: Reads[TodoTypeRow] = (
+    (__ \ "id").read[Int] and
+    (__ \ "title").read[String] and
+    (__ \ "insDatetime").read[Timestamp] and
+    (__ \ "updDatetime").read[Timestamp]
+  )(TodoTypeRow.apply _)
+
+//  def index = Action.async {
+//    Future(Ok(views.html.todotype.index()))
+//  }
 
   def list = Action.async {
-    service.all.map { x => 
-      Ok(views.html.todotype.list(x.toList))
+    service.all.map { x =>
+      Ok(Json.toJson(x))
     }
   }
-
-  case class TodoTypeForm(title: String)
 
   val todoTypeForm = Form(
     mapping(
@@ -40,6 +64,8 @@ class TodoTypeController @Inject() (service: TodoTypeService) extends Controller
 
   def insert = Action.async { implicit rs =>
     val todoType = todoTypeForm.bindFromRequest.get
-    service.insert(TodoTypeRow(0, todoType.title, new java.sql.Timestamp(System.currentTimeMillis), new java.sql.Timestamp(System.currentTimeMillis))).map(_ => Redirect(routes.TodoTypeController.list))
+
+    service.insert(TodoTypeRow(0, todoType.title, new java.sql.Timestamp(System.currentTimeMillis), new java.sql.Timestamp(System.currentTimeMillis))).map(_ => Ok(Json.toJson("ok")))
+
   }
 }

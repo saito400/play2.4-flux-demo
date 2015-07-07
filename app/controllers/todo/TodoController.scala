@@ -17,21 +17,49 @@ import models.Tables._
 import scala.concurrent.Future
 import service.todo.{TodoService, TodoTypeService}
 import javax.inject.Inject
+import play.api.libs.json._
+import play.api.libs.functional.syntax._
+import java.sql.Timestamp
+import service.todo.TodoSearchResult
 
 class TodoController @Inject() (todoService: TodoService, todoTypeService: TodoTypeService) extends Controller {
 
-  def index = Action.async {
-    Future(Ok(views.html.todo.index()))
-  }
+  implicit val rds: Reads[Timestamp] = (__ \ "time").read[Long].map { long => new Timestamp(long) }
+  implicit val wrs: Writes[Timestamp] = (__ \ "time").write[Long].contramap { (a: Timestamp) => a.getTime }
+  implicit val fmt: Format[Timestamp] = Format(rds, wrs)
+
+  implicit val todoRowWrites: Writes[TodoRow] = (
+    (__ \ "id").write[Int] and
+    (__ \ "todoTypeId").writeNullable[Int] and
+    (__ \ "content").write[String] and
+    (__ \ "insDatetime").write[Timestamp] and
+    (__ \ "updDatetime").write[Timestamp]
+  )(unlift(TodoRow.unapply))
+
+  implicit val todoRowReads: Reads[TodoRow] = (
+    (__ \ "id").read[Int] and
+    (__ \ "todoTypeId").readNullable[Int] and
+    (__ \ "content").read[String] and
+    (__ \ "insDatetime").read[Timestamp] and
+    (__ \ "updDatetime").read[Timestamp]
+  )(TodoRow.apply _)
+
+  implicit val todoSearchResultWrites: Writes[TodoSearchResult] = (
+    (__ \ "id").write[Int] and
+    (__ \ "content").write[String] and
+    (__ \ "title").writeNullable[String]
+  )(unlift(TodoSearchResult.unapply))
+
+  implicit val todoSearchResultReads: Reads[TodoSearchResult] = (
+    (__ \ "id").read[Int] and
+    (__ \ "content").read[String] and
+    (__ \ "title").readNullable[String]
+  )(TodoSearchResult.apply _)
 
   def list = Action.async {
-    val r = for {
-     res1 <- todoService.list
-     res2 <- todoTypeService.all
-    } yield {
-      (res1, res2)
+    todoService.list.map { x =>
+      Ok(Json.toJson(x))
     }
-    r.map(x => Ok(views.html.todo.list(x)))
   }
 
   case class TodoForm(todoTypeId: Option[Int] = None, content: String)
@@ -45,6 +73,6 @@ class TodoController @Inject() (todoService: TodoService, todoTypeService: TodoT
 
   def insert = Action.async { implicit rs =>
     val todo = todoForm.bindFromRequest.get
-    todoService.insert(TodoRow(0, todo.todoTypeId, todo.content, new java.sql.Timestamp(System.currentTimeMillis), new java.sql.Timestamp(System.currentTimeMillis))).map(_ => Redirect(routes.TodoController.list))
+    todoService.insert(TodoRow(0, todo.todoTypeId, todo.content, new java.sql.Timestamp(System.currentTimeMillis), new java.sql.Timestamp(System.currentTimeMillis))).map(_ => Ok(Json.toJson("ok")))
   }
 }

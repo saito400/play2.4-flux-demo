@@ -10,6 +10,8 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import slick.driver.JdbcProfile
 import models.Tables._
 
+case class TodoSearchResult(id: Int, content: String, title: Option[String])
+
 class TodoService @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) extends HasDatabaseConfigProvider[JdbcProfile] {
   import driver.api._
 
@@ -18,15 +20,20 @@ class TodoService @Inject()(protected val dbConfigProvider: DatabaseConfigProvid
 
   def all(): Future[Seq[TodoRow]] = db.run(todos.result)
 
-  def list(): Future[Seq[(Int, Option[Int], String)]] = {
+  def list(): Future[Seq[TodoSearchResult]] = {
     val todoList = for {
       (t, tt) <- todos joinLeft todoTypes on(_.todoTypeId === _.id) sortBy {
         case (t1, t2) => t1.id
       }
-    } yield (t.id, tt.map(_.id), t.content)
-    db.run(todoList.result)
-  }
+    } yield (t.id, t.content, tt.map(_.title))
+    val a = db.run(todoList.result)
 
+    a.map { x =>
+      x.map { xx =>
+        TodoSearchResult.tupled(xx)
+      }
+    }
+  }
 
   def insert(todo: TodoRow): Future[Unit] = db.run(todos += todo).map { _ => () }
 
