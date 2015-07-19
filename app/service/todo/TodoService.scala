@@ -15,14 +15,11 @@ case class TodoSearchResult(id: Int, content: String, title: Option[String])
 class TodoService @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) extends HasDatabaseConfigProvider[JdbcProfile] {
   import driver.api._
 
-  private val todos = TableQuery[Todo]
-  private val todoTypes = TableQuery[TodoType]
-
-  def all(): Future[Seq[TodoRow]] = db.run(todos.result)
+  def all(): Future[Seq[TodoRow]] = db.run(Todo.result)
 
   def list(): Future[Seq[TodoSearchResult]] = {
     val todoList = for {
-      (t, tt) <- todos joinLeft todoTypes on(_.todoTypeId === _.id) sortBy {
+      (t, tt) <- Todo joinLeft TodoType on(_.todoTypeId === _.id) sortBy {
         case (t1, t2) => t1.id
       }
     } yield (t.id, t.content, tt.map(_.title))
@@ -35,6 +32,6 @@ class TodoService @Inject()(protected val dbConfigProvider: DatabaseConfigProvid
     }
   }
 
-  def insert(todo: TodoRow): Future[Unit] = db.run(todos += todo).map { _ => () }
+  def insert(todo: TodoRow): Future[Unit] = db.run(Todo += todo).map { _ => () }
 
 }
