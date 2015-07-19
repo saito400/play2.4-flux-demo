@@ -21,7 +21,7 @@ $ activator
 
 [play2.4demo] $ runMain tools.Generator
 
-## TODO
+# npms
 
 ## install npm modules
 $ npm install

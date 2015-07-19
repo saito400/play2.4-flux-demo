@@ -26,8 +26,6 @@ class TodoTypeController @Inject() (service: TodoTypeService) extends Controller
   case class TodoTypeForm(title: String)
   implicit val todoTypeFormat = Json.format[TodoTypeForm]
 
-  //  implicit val timeFormat = Json.format[java.sql.Timestamp]
-
   implicit val rds: Reads[Timestamp] = (__ \ "time").read[Long].map { long => new Timestamp(long) }
   implicit val wrs: Writes[Timestamp] = (__ \ "time").write[Long].contramap { (a: Timestamp) => a.getTime }
   implicit val fmt: Format[Timestamp] = Format(rds, wrs)
@@ -45,10 +43,6 @@ class TodoTypeController @Inject() (service: TodoTypeService) extends Controller
     (__ \ "insDatetime").read[Timestamp] and
     (__ \ "updDatetime").read[Timestamp]
   )(TodoTypeRow.apply _)
-
-//  def index = Action.async {
-//    Future(Ok(views.html.todotype.index()))
-//  }
 
   def list = Action.async {
     service.all.map { x =>

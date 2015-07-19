@@ -7,8 +7,8 @@ var Navi = React.createClass({
   render: function() {
     return (
       <div>
-        <Link to="todo">todo一覧</Link> | 
-        <Link to="todo-type"> todotype一覧</Link>
+        <Link to="todo">todo list</Link> | 
+        <Link to="todo-type"> todotype list</Link>
         <RouteHandler {...this.props} />
       </div>
     );
