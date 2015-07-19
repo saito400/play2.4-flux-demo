@@ -6,11 +6,13 @@ var buffer     = require('vinyl-buffer');
 var sourcemaps = require('gulp-sourcemaps');
 //var uglify = require('gulp-uglify') // comment out for now because it takes too much time
 var watchify   = require('watchify');
+var handleErrors = require('./handleErrors');
 
 gulp.task('build', function() {
     return watchify(browserify({ entries: './app/views/app.jsx', debug: true }, watchify.args))
         .transform(babelify)
         .bundle()
+        .on('error', handleErrors)
         .pipe(source('bundle.js'))
           .pipe(buffer())
           .pipe(sourcemaps.init({ loadMaps: true  }))
