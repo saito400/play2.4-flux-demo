@@ -10,13 +10,9 @@ GET     /assets/*file               controllers.Assets.versioned(path="/public",
 
 GET     /                         controllers.Assets.at(path="/public", file="index.html") 
 
-# GET     /todo/index                         controllers.Assets.at(path="/public", file="index.html") 
-
 GET     /todo/list                           controllers.todo.TodoController.list
 
 POST     /todo/create                           controllers.todo.TodoController.insert
-
-# GET     /todotype/index                         controllers.Assets.at(path="/public", file="/todotype/index.html") 
 
 GET     /todotype/list                           controllers.todo.TodoTypeController.list
 
