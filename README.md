@@ -15,10 +15,23 @@ $ mysql -u root
 
 mysql> drop database playdemo; create database playdemo;
 
-# How to update Slick table object
+## How to update Slick table object
 
 $ activator
 
 [play2.4demo] $ runMain tools.Generator
+
+## TODO
+
+## install npm modules
+$ npm install
+
+## build JavaScript files
+$ npm build
+
+## gulp watch
+$ npm watch
+
+
 
 
