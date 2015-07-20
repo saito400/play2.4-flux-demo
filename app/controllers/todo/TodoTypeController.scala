@@ -58,8 +58,21 @@ class TodoTypeController @Inject() (service: TodoTypeService) extends Controller
 
   def insert = Action.async { implicit rs =>
     val todoType = todoTypeForm.bindFromRequest.get
-
     service.insert(TodoTypeRow(0, todoType.title, new java.sql.Timestamp(System.currentTimeMillis), new java.sql.Timestamp(System.currentTimeMillis))).map(_ => Ok(Json.toJson("ok")))
+  }
 
+
+  case class IDForm(id: Int)
+  val idForm = Form(
+    mapping(
+      "id" -> number()
+    )(IDForm.apply)(IDForm.unapply)
+  )
+
+  def delete = Action.async { implicit rs =>
+    val form= idForm.bindFromRequest.get
+    service.deleteById(form.id).map { x => 
+      Ok(Json.toJson("ok"))
+    }
   }
 }
