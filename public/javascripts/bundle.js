@@ -311,30 +311,55 @@ var React = require("react"),
     FluxMixin = Fluxxor.FluxMixin(React),
     StoreWatchMixin = Fluxxor.StoreWatchMixin;
 
+var Todo = React.createClass({
+  displayName: "Todo",
+
+  mixins: [FluxMixin, StoreWatchMixin("todoType")],
+
+  getStateFromFlux: function getStateFromFlux() {
+    return this.getFlux().store("todoType").getState();
+  },
+
+  "delete": function _delete() {
+    this.getFlux().actions.todoType.remove(React.findDOMNode(this.refs.tid).value);
+  },
+
+  render: function render() {
+    return React.createElement(
+      "tr",
+      { key: this.props.data.id },
+      React.createElement(
+        "td",
+        null,
+        this.props.data.id
+      ),
+      React.createElement(
+        "td",
+        null,
+        this.props.data.title
+      ),
+      React.createElement(
+        "td",
+        null,
+        React.createElement("input", { type: "hidden", value: this.props.data.id, ref: "tid" }),
+        React.createElement("input", { type: "button", value: "delete", onClick: this["delete"] })
+      )
+    );
+  }
+});
+
 var Todos = React.createClass({
   displayName: "Todos",
 
+  mixins: [FluxMixin, StoreWatchMixin("todoType")],
+
+  getStateFromFlux: function getStateFromFlux() {
+    return this.getFlux().store("todoType").getState();
+  },
+
   render: function render() {
     var items = this.props.data.map(function (x) {
-      return React.createElement(
-        "tr",
-        { key: x.id },
-        React.createElement(
-          "td",
-          null,
-          x.id
-        ),
-        React.createElement(
-          "td",
-          null,
-          x.title
-        ),
-        React.createElement(
-          "td",
-          null,
-          "X"
-        )
-      );
+      return React.createElement(Todo, { data: x });
     });
     return React.createElement(
       "tbody",
@@ -529,13 +554,15 @@ var TodoTypeStore = Fluxxor.createStore({
     var sendData = {
       id: id
     };
+
     $.ajax({
       url: "/todotype/delete",
       dataType: "json",
       method: "POST",
       data: sendData,
       success: (function (data) {
-        this.getTodoTypes();
+        this.load();
+        this.emit("change");
       }).bind(this),
       error: (function (xhr, status, err) {
         console.error(status, err.toString());

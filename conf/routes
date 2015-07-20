@@ -18,5 +18,6 @@ GET     /todotype/list                           controllers.todo.TodoTypeContro
 
 POST     /todotype/create                           controllers.todo.TodoTypeController.insert
 
+POST     /todotype/delete                           controllers.todo.TodoTypeController.delete
 
 

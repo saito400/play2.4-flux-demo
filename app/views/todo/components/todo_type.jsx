@@ -5,9 +5,40 @@ var React = require("react"),
     FluxMixin = Fluxxor.FluxMixin(React),
     StoreWatchMixin = Fluxxor.StoreWatchMixin;
 
-var Todos = React.createClass({
+var Todo = React.createClass({
+  mixins: [FluxMixin, StoreWatchMixin("todoType")],
+
+  getStateFromFlux: function() {
+    return this.getFlux().store("todoType").getState();
+  },
+
+  delete: function() {
+    this.getFlux().actions.todoType.remove(React.findDOMNode(this.refs.tid).value);
+  },
+
   render: function() {
-    var items = this.props.data.map(x => <tr key={x.id}><td>{x.id}</td><td>{x.title}</td></tr>);
+    return (
+      <tr key={this.props.data.id}>
+        <td>{this.props.data.id}</td>
+        <td>{this.props.data.title}</td>
+        <td>
+          <input type="hidden" value={this.props.data.id} ref="tid" />
+          <input type="button" value="delete" onClick={this.delete} />
+        </td>
+      </tr>
+    );
+  }
+});
+
+var Todos = React.createClass({
+  mixins: [FluxMixin, StoreWatchMixin("todoType")],
+
+  getStateFromFlux: function() {
+    return this.getFlux().store("todoType").getState();
+  },
+
+  render: function() {
+    var items = this.props.data.map(x => <Todo data={x} />);
     return (
       <tbody>
         {items}
@@ -43,7 +74,7 @@ module.exports = React.createClass({
         </form>
         <table>
           <thead>
-            <tr><th>id</th><th>title</th></tr>
+            <tr><th>id</th><th>category</th><th>delete</th></tr>
           </thead>
           <Todos data={this.state.todoTypes} />
         </table>

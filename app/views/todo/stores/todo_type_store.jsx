@@ -34,13 +34,15 @@ var TodoTypeStore = Fluxxor.createStore({
     var sendData = {
       id:id
     }
+
     $.ajax({
       url: '/todotype/delete',
       dataType: 'json',
       method: 'POST',
       data: sendData,
       success: function(data) {
-        this.getTodoTypes();
+        this.load();
+        this.emit("change");
       }.bind(this),
       error: function(xhr, status, err) {
         console.error(status, err.toString());
