@@ -33,8 +33,8 @@ module.exports = React.createClass({
       todoTypeId: this.state.todoTypeId,
       content: this.refs.content.getDOMNode().value
     }
-
-    return this.getFlux().actions.todo.add(sendData);
+    this.getFlux().actions.todo.add(sendData);
+    this.getFlux().actions.todo.load();
   },
 
   updateOption: function(e) {
