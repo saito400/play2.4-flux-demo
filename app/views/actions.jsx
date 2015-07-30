@@ -21,28 +21,108 @@ var methods = {
 
   todo: {
     load: function(){
-      this.dispatch(c.TODO.LOAD);
+      $.ajax({
+        url: '/todo/list',
+        dataType: 'json',
+        success: function(data) {
+          this.dispatch(c.TODO.LOAD, data);
+        }.bind(this),
+        error: function(xhr, status, err) {
+          console.error(status, err.toString());
+        }.bind(this)
+      });
     },
     load_initial: function(){
-      this.dispatch(c.TODO.LOAD_INITIAL);
+      $.ajax({
+        url: '/todotype/list',
+        dataType: 'json',
+        success: function(data) {
+          this.dispatch(c.TODO.LOAD_INITIAL, data);
+        }.bind(this),
+        error: function(xhr, status, err) {
+          console.error(this.props.url, status, err.toString());
+        }.bind(this)
+      });
     },
     remove: function(id) {
-      this.dispatch(c.TODO.REMOVE, id);
+
+      var sendData = {
+        id:id
+      }
+      $.ajax({
+        url: '/todo/delete',
+        dataType: 'json',
+        method: 'POST',
+        data: sendData,
+        success: function(data) {
+          this.dispatch(c.TODO.REMOVE);
+          this.getTodoTypes();
+        }.bind(this),
+        error: function(xhr, status, err) {
+          console.error(status, err.toString());
+        }.bind(this)
+      });
+
     },
     add: function(payload) {
-      this.dispatch(c.TODO.ADD, payload);
+      $.ajax({
+        url: '/todo/create',
+        dataType: 'json',
+        method: 'POST',
+        data: payload,
+        success: function(data) {
+
+        }.bind(this),
+        error: function(xhr, status, err) {
+          console.error(status, err.toString());
+        }.bind(this)
+      });
     }
   },
 
   todoType: {
     load: function(){
-      this.dispatch(c.TODO_TYPE.LOAD);
+      $.ajax({
+        url: '/todotype/list',
+        dataType: 'json',
+        success: function(data) {
+          this.dispatch(c.TODO_TYPE.LOAD, data);
+        }.bind(this),
+        error: function(xhr, status, err) {
+          console.error(status, err.toString());
+        }.bind(this)
+      });
     },
     remove: function(id) {
-      this.dispatch(c.TODO_TYPE.REMOVE, id);
+      var sendData = {
+        id:id
+      }
+      $.ajax({
+        url: '/todotype/delete',
+        dataType: 'json',
+        method: 'POST',
+        data: sendData,
+        success: function(data) {
+          this.dispatch(c.TODO_TYPE.REMOVE, id);
+        }.bind(this),
+        error: function(xhr, status, err) {
+          console.error(status, err.toString());
+        }.bind(this)
+      });
     },
     add: function(payload) {
-      this.dispatch(c.TODO_TYPE.ADD, payload);
+      $.ajax({
+        url: '/todotype/create',
+        dataType: 'json',
+        method: 'POST',
+        data: payload,
+        success: function(data) {
+
+        }.bind(this),
+        error: function(xhr, status, err) {
+          console.error(status, err.toString());
+        }.bind(this)
+      });
     }
   },
 

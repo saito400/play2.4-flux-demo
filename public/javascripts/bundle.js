@@ -24,28 +24,104 @@ var methods = {
 
   todo: {
     load: function load() {
-      this.dispatch(c.TODO.LOAD);
+
+      $.ajax({
+        url: "/todo/list",
+        dataType: "json",
+        success: (function (data) {
+          this.dispatch(c.TODO.LOAD, data);
+        }).bind(this),
+        error: (function (xhr, status, err) {
+          console.error(status, err.toString());
+        }).bind(this)
+      });
     },
     load_initial: function load_initial() {
-      this.dispatch(c.TODO.LOAD_INITIAL);
+      $.ajax({
+        url: "/todotype/list",
+        dataType: "json",
+        success: (function (data) {
+          this.dispatch(c.TODO.LOAD_INITIAL, data);
+        }).bind(this),
+        error: (function (xhr, status, err) {
+          console.error(this.props.url, status, err.toString());
+        }).bind(this)
+      });
     },
     remove: function remove(id) {
-      this.dispatch(c.TODO.REMOVE, id);
+
+      var sendData = {
+        id: id
+      };
+      $.ajax({
+        url: "/todo/delete",
+        dataType: "json",
+        method: "POST",
+        data: sendData,
+        success: (function (data) {
+          this.dispatch(c.TODO.REMOVE);
+          this.getTodoTypes();
+        }).bind(this),
+        error: (function (xhr, status, err) {
+          console.error(status, err.toString());
+        }).bind(this)
+      });
     },
     add: function add(payload) {
-      this.dispatch(c.TODO.ADD, payload);
+      $.ajax({
+        url: "/todo/create",
+        dataType: "json",
+        method: "POST",
+        data: payload,
+        success: (function (data) {}).bind(this),
+        error: (function (xhr, status, err) {
+          console.error(status, err.toString());
+        }).bind(this)
+      });
     }
   },
 
   todoType: {
     load: function load() {
-      this.dispatch(c.TODO_TYPE.LOAD);
+      $.ajax({
+        url: "/todotype/list",
+        dataType: "json",
+        success: (function (data) {
+          this.dispatch(c.TODO_TYPE.LOAD, data);
+        }).bind(this),
+        error: (function (xhr, status, err) {
+          console.error(status, err.toString());
+        }).bind(this)
+      });
     },
     remove: function remove(id) {
-      this.dispatch(c.TODO_TYPE.REMOVE, id);
+      var sendData = {
+        id: id
+      };
+      $.ajax({
+        url: "/todotype/delete",
+        dataType: "json",
+        method: "POST",
+        data: sendData,
+        success: (function (data) {
+          this.dispatch(c.TODO_TYPE.REMOVE, id);
+        }).bind(this),
+        error: (function (xhr, status, err) {
+          console.error(status, err.toString());
+        }).bind(this)
+      });
     },
     add: function add(payload) {
-      this.dispatch(c.TODO_TYPE.ADD, payload);
+      $.ajax({
+        url: "/todotype/create",
+        dataType: "json",
+        method: "POST",
+        data: payload,
+        success: (function (data) {}).bind(this),
+        error: (function (xhr, status, err) {
+          console.error(status, err.toString());
+        }).bind(this)
+      });
     }
   },
 
@@ -234,8 +310,8 @@ module.exports = React.createClass({
       todoTypeId: this.state.todoTypeId,
       content: this.refs.content.getDOMNode().value
     };
-
-    return this.getFlux().actions.todo.add(sendData);
+    this.getFlux().actions.todo.add(sendData);
+    this.getFlux().actions.todo.load();
   },
 
   updateOption: function updateOption(e) {
@@ -391,6 +467,7 @@ module.exports = React.createClass({
       title: this.refs.title.getDOMNode().value
     };
     this.getFlux().actions.todoType.add(sendData);
+    this.getFlux().actions.todoType.load();
   },
 
   render: function render() {
@@ -448,69 +525,21 @@ var TodoStore = Fluxxor.createStore({
     this.todos = [];
     this.todoTypes = [];
 
-    this.bindActions(actions.constants.TODO.LOAD_INITIAL, this.loadInitialData, actions.constants.TODO.LOAD, this.load, actions.constants.TODO.ADD, this.onAdd, actions.constants.TODO.REMOVE, this.onRemove);
+    this.bindActions(actions.constants.TODO.LOAD_INITIAL, this.loadInitialData, actions.constants.TODO.LOAD, this.load, actions.constants.TODO.REMOVE, this.onRemove);
   },
 
-  onAdd: function onAdd(payload) {
-    $.ajax({
-      url: "/todo/create",
-      dataType: "json",
-      method: "POST",
-      data: payload,
-      success: (function (data) {
-        this.load();
-        this.emit("change");
-      }).bind(this),
-      error: (function (xhr, status, err) {
-        console.error(status, err.toString());
-      }).bind(this)
-    });
+  onRemove: function onRemove() {
+    this.emit("change");
   },
 
-  onRemove: function onRemove(id) {
-    var sendData = {
-      id: id
-    };
-    $.ajax({
-      url: "/todo/delete",
-      dataType: "json",
-      method: "POST",
-      data: sendData,
-      success: (function (data) {
-        this.getTodoTypes();
-      }).bind(this),
-      error: (function (xhr, status, err) {
-        console.error(status, err.toString());
-      }).bind(this)
-    });
+  loadInitialData: function loadInitialData(data) {
+    this.todoTypes = data;
+    this.emit("change");
   },
 
-  loadInitialData: function loadInitialData() {
-    $.ajax({
-      url: "/todotype/list",
-      dataType: "json",
-      success: (function (data) {
-        this.todoTypes = data;
-        this.emit("change");
-      }).bind(this),
-      error: (function (xhr, status, err) {
-        console.error(this.props.url, status, err.toString());
-      }).bind(this)
-    });
-  },
-
-  load: function load() {
-    $.ajax({
-      url: "/todo/list",
-      dataType: "json",
-      success: (function (data) {
-        this.todos = data;
-        this.emit("change");
-      }).bind(this),
-      error: (function (xhr, status, err) {
-        console.error(status, err.toString());
-      }).bind(this)
-    });
+  load: function load(data) {
+    this.todos = data;
+    this.emit("change");
   },
 
   getState: function getState() {
@@ -535,57 +564,19 @@ var TodoTypeStore = Fluxxor.createStore({
 
     this.todoTypes = [];
 
-    this.bindActions(actions.constants.TODO_TYPE.LOAD, this.load, actions.constants.TODO_TYPE.ADD, this.add, actions.constants.TODO_TYPE.REMOVE, this.onRemoveTodoType);
-  },
-
-  add: function add(payload) {
-    $.ajax({
-      url: "/todotype/create",
-      dataType: "json",
-      method: "POST",
-      data: payload,
-      success: (function (data) {
-        this.load();
-        this.emit("change");
-      }).bind(this),
-      error: (function (xhr, status, err) {
-        console.error(status, err.toString());
-      }).bind(this)
-    });
+    this.bindActions(actions.constants.TODO_TYPE.LOAD, this.load, actions.constants.TODO_TYPE.REMOVE, this.onRemoveTodoType);
   },
 
   onRemoveTodoType: function onRemoveTodoType(id) {
-    var sendData = {
-      id: id
-    };
-
-    $.ajax({
-      url: "/todotype/delete",
-      dataType: "json",
-      method: "POST",
-      data: sendData,
-      success: (function (data) {
-        this.load();
-        this.emit("change");
-      }).bind(this),
-      error: (function (xhr, status, err) {
-        console.error(status, err.toString());
-      }).bind(this)
+    this.todoTypes = this.todoTypes.filter(function (x) {
+      return x.id != id;
     });
+    this.emit("change");
   },
 
-  load: function load() {
-    $.ajax({
-      url: "/todotype/list",
-      dataType: "json",
-      success: (function (data) {
-        this.todoTypes = data;
-        this.emit("change");
-      }).bind(this),
-      error: (function (xhr, status, err) {
-        console.error(status, err.toString());
-      }).bind(this)
-    });
+  load: function load(data) {
+    this.todoTypes = data;
+    this.emit("change");
   },
 
   getState: function getState() {
