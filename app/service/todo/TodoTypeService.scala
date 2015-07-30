@@ -17,8 +17,14 @@ class TodoTypeService @Inject()(protected val dbConfigProvider: DatabaseConfigPr
 
   def insert(t: TodoTypeRow): Future[Unit] = db.run(TodoType += t).map { _ => () }
 
-  def deleteById(id: Int): Future[Int] = {
-    val a = TodoType.filter(_.id === id.bind).delete
-    db.run(a)
+  def deleteById(id: Int): Future[Unit] = {
+
+    val q = ( for {
+      _ <- Todo.filter(_.todoTypeId === id.bind).delete
+      _ <- TodoType.filter(_.id === id.bind).delete
+    } yield ()).transactionally
+
+    db.run(q)
+
   }
 }

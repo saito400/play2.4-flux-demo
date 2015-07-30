@@ -13,6 +13,10 @@ var Todo = React.createClass({
   },
 
   delete: function() {
+    if(!confirm("delete with related todos?")){
+      return;
+    }
+
     this.getFlux().actions.todoType.remove(React.findDOMNode(this.refs.tid).value);
   },
 
