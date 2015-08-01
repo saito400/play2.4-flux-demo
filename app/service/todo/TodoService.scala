@@ -22,14 +22,8 @@ class TodoService @Inject()(protected val dbConfigProvider: DatabaseConfigProvid
       (t, tt) <- Todo joinLeft TodoType on(_.todoTypeId === _.id) sortBy {
         case (t1, t2) => t1.id
       }
-    } yield (t.id, t.content, tt.map(_.title))
-    val a = db.run(todoList.result)
-
-    a.map { x =>
-      x.map { xx =>
-        TodoSearchResult.tupled(xx)
-      }
-    }
+    } yield (t.id, t.content, tt.map(_.title)) <> (TodoSearchResult.tupled, TodoSearchResult.unapply)
+    db.run(todoList.result)
   }
 
   def insert(todo: TodoRow): Future[Unit] = db.run(Todo += todo).map { _ => () }
