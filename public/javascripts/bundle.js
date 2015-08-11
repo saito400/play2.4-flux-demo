@@ -36,15 +36,13 @@ var methods = {
       });
     },
     load_initial: function load_initial() {
-      $.ajax({
-        url: "/todotype/list",
-        dataType: "json",
-        success: (function (data) {
-          this.dispatch(c.TODO.LOAD_INITIAL, data);
-        }).bind(this),
-        error: (function (xhr, status, err) {
-          console.error(this.props.url, status, err.toString());
-        }).bind(this)
+      fetch("/todotype/list").then(function (response) {
+        return response.json();
+      }).then((function (json) {
+        console.log("parsed json", json);
+        this.dispatch(c.TODO.LOAD_INITIAL, json);
+      }).bind(this))["catch"](function (ex) {
+        console.log("parsing failed", ex);
       });
     },
     remove: function remove(id) {
@@ -67,15 +65,13 @@ var methods = {
       });
     },
     add: function add(payload) {
-      $.ajax({
-        url: "/todo/create",
-        dataType: "json",
-        method: "POST",
-        data: payload,
-        success: (function (data) {}).bind(this),
-        error: (function (xhr, status, err) {
-          console.error(status, err.toString());
-        }).bind(this)
+      fetch("/todo/create", {
+        method: "post",
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
       });
     }
   },
