@@ -1,3 +1,5 @@
+require("whatwg-fetch");
+
 var c = {
   TODO: {
     LOAD: "LOAD_TODO",
@@ -21,16 +23,15 @@ var methods = {
 
   todo: {
     load: function(){
-      $.ajax({
-        url: '/todo/list',
-        dataType: 'json',
-        success: function(data) {
-          this.dispatch(c.TODO.LOAD, data);
-        }.bind(this),
-        error: function(xhr, status, err) {
-          console.error(status, err.toString());
-        }.bind(this)
-      });
+      fetch('/todo/list')
+        .then(function(response) {
+          return response.json()
+        }).then(function(json) {
+          console.log('parsed json', json)
+          this.dispatch(c.TODO.LOAD, json);
+        }.bind(this)).catch(function(ex) {
+          console.log('parsing failed', ex)
+        })
     },
     load_initial: function(){
       $.ajax({
