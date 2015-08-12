@@ -49,20 +49,20 @@ var methods = {
       var sendData = {
         id:id
       }
-      $.ajax({
-        url: '/todo/delete',
-        dataType: 'json',
-        method: 'POST',
-        data: sendData,
-        success: function(data) {
-          this.dispatch(c.TODO.REMOVE);
-          this.getTodoTypes();
-        }.bind(this),
-        error: function(xhr, status, err) {
-          console.error(status, err.toString());
-        }.bind(this)
-      });
 
+      fetch('/todo/delete', {
+        method: 'post',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(sendData)
+      }).then(function() {
+        this.dispatch(c.TODO.REMOVE);
+        this.getTodoTypes();
+      }.bind(this)).catch(function(ex) {
+        console.log('deleting failed', ex)
+      })
     },
     add: function(payload) {
       fetch('/todo/create', {
@@ -78,47 +78,45 @@ var methods = {
 
   todoType: {
     load: function(){
-      $.ajax({
-        url: '/todotype/list',
-        dataType: 'json',
-        success: function(data) {
-          this.dispatch(c.TODO_TYPE.LOAD, data);
-        }.bind(this),
-        error: function(xhr, status, err) {
-          console.error(status, err.toString());
-        }.bind(this)
-      });
+      fetch('/todotype/list')
+        .then(function(response) {
+          return response.json()
+        }).then(function(json) {
+          console.log('parsed json', json)
+          this.dispatch(c.TODO_TYPE.LOAD, json);
+        }.bind(this)).catch(function(ex) {
+          console.log('parsing failed', ex)
+        })
     },
     remove: function(id) {
       var sendData = {
         id:id
       }
-      $.ajax({
-        url: '/todotype/delete',
-        dataType: 'json',
-        method: 'POST',
-        data: sendData,
-        success: function(data) {
-          this.dispatch(c.TODO_TYPE.REMOVE, id);
-        }.bind(this),
-        error: function(xhr, status, err) {
-          console.error(status, err.toString());
-        }.bind(this)
-      });
-    },
-    add: function(payload) {
-      $.ajax({
-        url: '/todotype/create',
-        dataType: 'json',
-        method: 'POST',
-        data: payload,
-        success: function(data) {
 
-        }.bind(this),
-        error: function(xhr, status, err) {
-          console.error(status, err.toString());
-        }.bind(this)
-      });
+      fetch('/todotype/delete', {
+        method: 'post',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(sendData)
+      }).then(function() {
+        this.dispatch(c.TODO_TYPE.REMOVE, id);
+//        this.getTodoTypes();
+      }.bind(this)).catch(function(ex) {
+        console.log('deleting failed', ex)
+      })
+    },
+
+    add: function(payload) {
+      fetch('/todotype/create', {
+        method: 'post',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      })
     }
   },
 
