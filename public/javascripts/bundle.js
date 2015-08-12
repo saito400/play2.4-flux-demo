@@ -107,6 +107,7 @@ var methods = {
         console.log("deleting failed", ex);
       });
     },
+
     add: function add(payload) {
       fetch("/todotype/create", {
         method: "post",
