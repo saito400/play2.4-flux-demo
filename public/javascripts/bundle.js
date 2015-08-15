@@ -102,9 +102,8 @@ var methods = {
         body: JSON.stringify(sendData)
       }).then((function () {
         this.dispatch(c.TODO_TYPE.REMOVE, id);
-        //        this.getTodoTypes();
       }).bind(this))["catch"](function (ex) {
-        console.log("deleting failed", ex);
+        console.log("error ", ex);
       });
     },
 
@@ -116,6 +115,10 @@ var methods = {
           "Content-Type": "application/json"
         },
         body: JSON.stringify(payload)
+      }).then((function () {
+        this.flux.actions.todoType.load();
+      }).bind(this))["catch"](function (ex) {
+        console.log("error ", ex);
       });
     }
   },
@@ -462,7 +465,7 @@ module.exports = React.createClass({
       title: this.refs.title.getDOMNode().value
     };
     this.getFlux().actions.todoType.add(sendData);
-    this.getFlux().actions.todoType.load();
+    //    this.getFlux().actions.todoType.load();
   },
 
   render: function render() {

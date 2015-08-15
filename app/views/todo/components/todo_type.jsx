@@ -67,7 +67,6 @@ module.exports = React.createClass({
       title:this.refs.title.getDOMNode().value
     }
     this.getFlux().actions.todoType.add(sendData);
-    this.getFlux().actions.todoType.load();
   },
 
   render: function() {
