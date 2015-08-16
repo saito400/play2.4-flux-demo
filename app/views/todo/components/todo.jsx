@@ -40,7 +40,6 @@ module.exports = React.createClass({
       content: this.refs.content.getDOMNode().value
     }
     this.getFlux().actions.todo.add(sendData);
-    this.getFlux().actions.todo.load();
   },
 
   updateOption: function(e) {
