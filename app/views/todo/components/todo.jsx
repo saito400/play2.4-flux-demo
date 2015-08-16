@@ -6,8 +6,14 @@ var React = require("react"),
     StoreWatchMixin = Fluxxor.StoreWatchMixin;
 
 var Todos = React.createClass({
+  mixins: [FluxMixin],
+
+  delete: function(id) {
+    this.getFlux().actions.todo.remove(id);
+  },
+
   render: function() {
-    var items = this.props.data.map(x => <tr key={x.id}><td> {x.id}</td><td> {x.title}</td><td> {x.content}</td></tr>);
+    var items = this.props.data.map(x => <tr key={x.id}><td> {x.id}</td><td> {x.title}</td><td> {x.content}</td><td><input type="button" value="delete" onClick={this.delete.bind(this, x.id)} /></td></tr>);
     return (
       <tbody>
         {items}
@@ -55,7 +61,7 @@ module.exports = React.createClass({
         </form>
         <table>
           <thead>
-            <tr><th> id </th><th> category </th><th> content </th></tr>
+            <tr><th> id </th><th> category </th><th> content </th><th> </th></tr>
           </thead>
           <Todos data={this.state.todos} />
         </table>

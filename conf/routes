@@ -14,6 +14,8 @@ GET     /todo/list                           controllers.todo.TodoController.lis
 
 POST     /todo/create                           controllers.todo.TodoController.insert
 
+POST     /todo/delete                           controllers.todo.TodoController.delete
+
 GET     /todotype/list                           controllers.todo.TodoTypeController.list
 
 POST     /todotype/create                           controllers.todo.TodoTypeController.insert
