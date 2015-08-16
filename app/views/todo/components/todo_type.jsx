@@ -6,7 +6,7 @@ var React = require("react"),
     StoreWatchMixin = Fluxxor.StoreWatchMixin;
 
 var Todo = React.createClass({
-  mixins: [FluxMixin, StoreWatchMixin("todoType")],
+  mixins: [FluxMixin],
 
   getStateFromFlux: function() {
     return this.getFlux().store("todoType").getState();
