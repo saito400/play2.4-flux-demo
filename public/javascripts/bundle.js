@@ -59,8 +59,7 @@ var methods = {
         },
         body: JSON.stringify(sendData)
       }).then((function () {
-        this.dispatch(c.TODO.REMOVE);
-        this.getTodoTypes();
+        this.flux.actions.todo.load();
       }).bind(this))["catch"](function (ex) {
         console.log("deleting failed", ex);
       });
@@ -256,7 +255,15 @@ var React = require("react"),
 var Todos = React.createClass({
   displayName: "Todos",
 
+  mixins: [FluxMixin],
+
+  "delete": function _delete(id) {
+    this.getFlux().actions.todo.remove(id);
+  },
+
   render: function render() {
+    var _this = this;
+
     var items = this.props.data.map(function (x) {
       return React.createElement(
         "tr",
@@ -278,6 +285,11 @@ var Todos = React.createClass({
           null,
           " ",
           x.content
+        ),
+        React.createElement(
+          "td",
+          null,
+          React.createElement("input", { type: "button", value: "delete", onClick: _this["delete"].bind(_this, x.id) })
         )
       );
     });
@@ -366,6 +378,11 @@ module.exports = React.createClass({
               "th",
               null,
               " content "
+            ),
+            React.createElement(
+              "th",
+              null,
+              " "
             )
           )
         ),
@@ -465,7 +482,6 @@ module.exports = React.createClass({
       title: this.refs.title.getDOMNode().value
     };
     this.getFlux().actions.todoType.add(sendData);
-    //    this.getFlux().actions.todoType.load();
   },
 
   render: function render() {

@@ -13,7 +13,7 @@ import models.Tables._
 case class TodoSearchResult(id: Int, content: String, title: Option[String])
 
 class TodoService @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) extends HasDatabaseConfigProvider[JdbcProfile] {
-  import driver.api._
+  import slick.driver.MySQLDriver.api._
 
   def all(): Future[Seq[TodoRow]] = db.run(Todo.result)
 
@@ -27,5 +27,7 @@ class TodoService @Inject()(protected val dbConfigProvider: DatabaseConfigProvid
   }
 
   def insert(todo: TodoRow): Future[Unit] = db.run(Todo += todo).map { _ => () }
+
+  def deleteById(id: Int): Future[Unit] = db.run(Todo.filter(_.id === id.bind).delete).map { _ => () }
 
 }

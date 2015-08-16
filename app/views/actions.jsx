@@ -58,8 +58,7 @@ var methods = {
         },
         body: JSON.stringify(sendData)
       }).then(function() {
-        this.dispatch(c.TODO.REMOVE);
-        this.getTodoTypes();
+        this.flux.actions.todo.load();        
       }.bind(this)).catch(function(ex) {
         console.log('deleting failed', ex)
       })
