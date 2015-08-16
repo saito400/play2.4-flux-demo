@@ -11,6 +11,7 @@ import play.api.db.slick.HasDatabaseConfig
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.mvc.Action
 import play.api.mvc.Controller
+import play.api.mvc.BodyParsers
 import slick.driver.JdbcProfile
 import models.Tables
 import models.Tables._
@@ -50,13 +51,8 @@ class TodoTypeController @Inject() (service: TodoTypeService) extends Controller
     }
   }
 
-  def insert = Action.async { implicit rs =>
-    val todoType = todoTypeForm.bindFromRequest.get
-    service.insert(TodoTypeRow(0, todoType.title, new java.sql.Timestamp(System.currentTimeMillis), new java.sql.Timestamp(System.currentTimeMillis))).map(_ => Ok(Json.toJson("ok")))
-  }
-
   def insert = Action.async(BodyParsers.parse.json) { request =>
-    request.body.validate[TodoForm].fold(
+    request.body.validate[TodoTypeForm].fold(
       errors => {
         scala.concurrent.Future {
           BadRequest(Json.obj("message" -> JsError.toJson(errors)))
