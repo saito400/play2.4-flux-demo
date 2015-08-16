@@ -40,7 +40,7 @@ var methods = {
           console.log('parsed json', json)
           this.dispatch(c.TODO.LOAD_INITIAL, json);
         }.bind(this)).catch(function(ex) {
-          console.log('parsing failed', ex)
+          console.log('error ', ex)
         })
     },
     remove: function(id) {
@@ -59,7 +59,7 @@ var methods = {
       }).then(function() {
         this.flux.actions.todo.load();        
       }.bind(this)).catch(function(ex) {
-        console.log('deleting failed', ex)
+        console.log('error ', ex)
       })
     },
     add: function(payload) {
@@ -70,6 +70,10 @@ var methods = {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(payload)
+      }).then(function() {
+        this.flux.actions.todo.load();        
+      }.bind(this)).catch(function(ex) {
+        console.log('error ', ex)
       })
     }
   },
