@@ -11,6 +11,7 @@ import play.api.db.slick.HasDatabaseConfig
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.mvc.Action
 import play.api.mvc.Controller
+import play.api.mvc.BodyParsers
 import slick.driver.JdbcProfile
 import models.Tables
 import models.Tables._
@@ -63,32 +64,36 @@ class TodoController @Inject() (todoService: TodoService, todoTypeService: TodoT
   }
 
   case class TodoForm(todoTypeId: Option[Int] = None, content: String)
+  implicit val todoFormlReads = Json.reads[TodoForm]
 
-  val todoForm = Form(
-    mapping(
-      "todoTypeId" -> optional(number),
-      "content" -> text()
-    )(TodoForm.apply)(TodoForm.unapply)
-  )
-
-  def insert = Action.async { implicit rs =>
-    val todo = todoForm.bindFromRequest.get
-    todoService.insert(TodoRow(0, todo.todoTypeId, todo.content, new java.sql.Timestamp(System.currentTimeMillis), new java.sql.Timestamp(System.currentTimeMillis))).map(_ => Ok(Json.toJson("ok")))
+  def insert = Action.async(BodyParsers.parse.json) { request =>
+    request.body.validate[TodoForm].fold(
+      errors => {
+        scala.concurrent.Future {
+          BadRequest(Json.obj("message" -> JsError.toJson(errors)))
+        }
+      },
+      form => {
+        todoService.insert(TodoRow(0, form.todoTypeId, form.content, new java.sql.Timestamp(System.currentTimeMillis), new java.sql.Timestamp(System.currentTimeMillis))).map(_ => Ok(Json.toJson("ok")))
+      }
+    )
   }
 
-//TODO remove
   case class IDForm(id: Int)
-  val idForm = Form(
-    mapping(
-      "id" -> number()
-    )(IDForm.apply)(IDForm.unapply)
-  )
+  implicit val idFormlReads = Json.reads[IDForm]
 
-  def delete = Action.async { implicit rs =>
-    val form = idForm.bindFromRequest.get
-    todoService.deleteById(form.id).map { x => 
-      Ok(Json.toJson("ok"))
-    }
+  def delete = Action.async(BodyParsers.parse.json) { request =>
+    request.body.validate[IDForm].fold(
+      errors => {
+        scala.concurrent.Future {
+          BadRequest(Json.obj("message" -> JsError.toJson(errors)))
+        }
+      },
+      form => {
+        todoService.deleteById(form.id).map { x => 
+          Ok(Json.toJson("ok"))
+        }
+      }
+    )
   }
-
 }
