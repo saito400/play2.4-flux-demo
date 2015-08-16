@@ -28,7 +28,6 @@ var methods = {
       fetch("/todo/list").then(function (response) {
         return response.json();
       }).then((function (json) {
-        console.log("parsed json", json);
         this.dispatch(c.TODO.LOAD, json);
       }).bind(this))["catch"](function (ex) {
         console.log("parsing failed", ex);
@@ -38,7 +37,6 @@ var methods = {
       fetch("/todotype/list").then(function (response) {
         return response.json();
       }).then((function (json) {
-        console.log("parsed json", json);
         this.dispatch(c.TODO.LOAD_INITIAL, json);
       }).bind(this))["catch"](function (ex) {
         console.log("error ", ex);
@@ -407,7 +405,7 @@ var React = require("react"),
 var Todo = React.createClass({
   displayName: "Todo",
 
-  mixins: [FluxMixin, StoreWatchMixin("todoType")],
+  mixins: [FluxMixin],
 
   getStateFromFlux: function getStateFromFlux() {
     return this.getFlux().store("todoType").getState();

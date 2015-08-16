@@ -26,7 +26,6 @@ var methods = {
         .then(function(response) {
           return response.json()
         }).then(function(json) {
-          console.log('parsed json', json)
           this.dispatch(c.TODO.LOAD, json);
         }.bind(this)).catch(function(ex) {
           console.log('parsing failed', ex)
@@ -37,7 +36,6 @@ var methods = {
         .then(function(response) {
           return response.json()
         }).then(function(json) {
-          console.log('parsed json', json)
           this.dispatch(c.TODO.LOAD_INITIAL, json);
         }.bind(this)).catch(function(ex) {
           console.log('error ', ex)
