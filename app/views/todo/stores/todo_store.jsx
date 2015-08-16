@@ -10,13 +10,8 @@ var TodoStore = Fluxxor.createStore({
 
     this.bindActions(
       actions.constants.TODO.LOAD_INITIAL, this.loadInitialData,
-      actions.constants.TODO.LOAD, this.load,
-      actions.constants.TODO.REMOVE, this.onRemove
+      actions.constants.TODO.LOAD, this.load
     );
-  },
-
-  onRemove: function() {
-    this.emit("change");
   },
 
   loadInitialData: function(data) {
