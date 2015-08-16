@@ -50,29 +50,39 @@ class TodoTypeController @Inject() (service: TodoTypeService) extends Controller
     }
   }
 
-  val todoTypeForm = Form(
-    mapping(
-      "title" -> text()
-    )(TodoTypeForm.apply)(TodoTypeForm.unapply)
-  )
-
   def insert = Action.async { implicit rs =>
     val todoType = todoTypeForm.bindFromRequest.get
     service.insert(TodoTypeRow(0, todoType.title, new java.sql.Timestamp(System.currentTimeMillis), new java.sql.Timestamp(System.currentTimeMillis))).map(_ => Ok(Json.toJson("ok")))
   }
 
+  def insert = Action.async(BodyParsers.parse.json) { request =>
+    request.body.validate[TodoForm].fold(
+      errors => {
+        scala.concurrent.Future {
+          BadRequest(Json.obj("message" -> JsError.toJson(errors)))
+        }
+      },
+      form => {
+        service.insert(TodoTypeRow(0, form.title, new java.sql.Timestamp(System.currentTimeMillis), new java.sql.Timestamp(System.currentTimeMillis))).map(_ => Ok(Json.toJson("ok")))
+      }
+    )
+  }
 
   case class IDForm(id: Int)
-  val idForm = Form(
-    mapping(
-      "id" -> number()
-    )(IDForm.apply)(IDForm.unapply)
-  )
+  implicit val idFormlReads = Json.reads[IDForm]
 
-  def delete = Action.async { implicit rs =>
-    val form= idForm.bindFromRequest.get
-    service.deleteById(form.id).map { x => 
-      Ok(Json.toJson("ok"))
-    }
+  def delete = Action.async(BodyParsers.parse.json) { request =>
+    request.body.validate[IDForm].fold(
+      errors => {
+        scala.concurrent.Future {
+          BadRequest(Json.obj("message" -> JsError.toJson(errors)))
+        }
+      },
+      form => {
+        service.deleteById(form.id).map { x => 
+          Ok(Json.toJson("ok"))
+        }
+      }
+    )
   }
 }
