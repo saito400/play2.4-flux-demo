@@ -32,6 +32,8 @@ $ npm build
 ## gulp watch
 $ npm watch
 
+# start server
 
+$ activator run
 
 
