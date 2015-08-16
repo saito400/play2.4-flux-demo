@@ -309,7 +309,7 @@ module.exports = React.createClass({
 
   add: function add() {
     var sendData = {
-      todoTypeId: this.state.todoTypeId,
+      todoTypeId: parseInt(this.state.todoTypeId),
       content: this.refs.content.getDOMNode().value
     };
     this.getFlux().actions.todo.add(sendData);
@@ -320,9 +320,6 @@ module.exports = React.createClass({
   },
 
   render: function render() {
-
-    console.debug(this.state);
-    console.debug(this.state.todoTypes);
 
     if (this.state.todoTypes.length == 0) {
       return React.createElement("div", null);

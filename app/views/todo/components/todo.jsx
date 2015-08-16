@@ -39,7 +39,7 @@ module.exports = React.createClass({
 
   add: function() {
     var sendData = {
-      todoTypeId: this.state.todoTypeId,
+      todoTypeId: parseInt(this.state.todoTypeId),
       content: this.refs.content.getDOMNode().value
     }
     this.getFlux().actions.todo.add(sendData);
