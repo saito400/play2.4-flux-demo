@@ -6,7 +6,6 @@ require("whatwg-fetch");
 var c = {
   TODO: {
     LOAD: "LOAD_TODO",
-    LOAD_INITIAL: "LOAD_INITIAL_TODO",
     ADD: "ADD_TODO"
   },
 
@@ -33,21 +32,10 @@ var methods = {
         console.log("parsing failed", ex);
       });
     },
-    load_initial: function load_initial() {
-      fetch("/todotype/list").then(function (response) {
-        return response.json();
-      }).then((function (json) {
-        this.dispatch(c.TODO.LOAD_INITIAL, json);
-      }).bind(this))["catch"](function (ex) {
-        console.log("error ", ex);
-      });
-    },
     remove: function remove(id) {
-
       var sendData = {
         id: id
       };
-
       fetch("/todo/delete", {
         method: "post",
         headers: {
@@ -305,15 +293,18 @@ var Todos = React.createClass({
 module.exports = React.createClass({
   displayName: "exports",
 
-  mixins: [FluxMixin, StoreWatchMixin("todo")],
+  mixins: [FluxMixin, StoreWatchMixin("todo", "todoType")],
 
   getStateFromFlux: function getStateFromFlux() {
-    return this.getFlux().store("todo").getState();
+    return {
+      todos: this.getFlux().store("todo").getState().todos,
+      todoTypes: this.getFlux().store("todoType").getState().todoTypes
+    };
   },
 
   componentDidMount: function componentDidMount() {
     this.getFlux().actions.todo.load();
-    this.getFlux().actions.todo.load_initial();
+    this.getFlux().actions.todoType.load();
   },
 
   add: function add() {
@@ -329,6 +320,14 @@ module.exports = React.createClass({
   },
 
   render: function render() {
+
+    console.debug(this.state);
+    console.debug(this.state.todoTypes);
+
+    if (this.state.todoTypes.length == 0) {
+      return React.createElement("div", null);
+    }
+
     var options = this.state.todoTypes.map(function (x) {
       return React.createElement(
         "option",
@@ -535,16 +534,8 @@ var actions = require("../../actions.jsx");
 
 var TodoStore = Fluxxor.createStore({
   initialize: function initialize() {
-
     this.todos = [];
-    this.todoTypes = [];
-
-    this.bindActions(actions.constants.TODO.LOAD_INITIAL, this.loadInitialData, actions.constants.TODO.LOAD, this.load);
-  },
-
-  loadInitialData: function loadInitialData(data) {
-    this.todoTypes = data;
-    this.emit("change");
+    this.bindActions(actions.constants.TODO.LOAD, this.load);
   },
 
   load: function load(data) {
@@ -554,8 +545,7 @@ var TodoStore = Fluxxor.createStore({
 
   getState: function getState() {
     return {
-      todos: this.todos,
-      todoTypes: this.todoTypes
+      todos: this.todos
     };
   }
 });

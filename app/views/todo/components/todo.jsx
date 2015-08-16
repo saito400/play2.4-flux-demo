@@ -23,15 +23,18 @@ var Todos = React.createClass({
 });
 
 module.exports = React.createClass({
-  mixins: [FluxMixin, StoreWatchMixin("todo")],
+  mixins: [FluxMixin, StoreWatchMixin("todo","todoType")],
 
   getStateFromFlux: function() {
-    return this.getFlux().store("todo").getState();
+    return {
+      todos: this.getFlux().store("todo").getState().todos,
+      todoTypes: this.getFlux().store("todoType").getState().todoTypes
+    };
   },
 
   componentDidMount: function() {
     this.getFlux().actions.todo.load();
-    this.getFlux().actions.todo.load_initial();
+    this.getFlux().actions.todoType.load();
   },
 
   add: function() {
@@ -47,6 +50,11 @@ module.exports = React.createClass({
   },
 
   render: function() {
+
+    if(this.state.todoTypes.length == 0){
+      return(<div></div>)
+    }
+
     var options = this.state.todoTypes.map(x => <option value={x.id}>{x.title}</option>);
     return (
       <div>
