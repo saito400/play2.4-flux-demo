@@ -7,8 +7,7 @@ var c = {
   TODO: {
     LOAD: "LOAD_TODO",
     LOAD_INITIAL: "LOAD_INITIAL_TODO",
-    ADD: "ADD_TODO",
-    REMOVE: "REMOVE_TODO"
+    ADD: "ADD_TODO"
   },
 
   TODO_TYPE: {
@@ -539,11 +538,7 @@ var TodoStore = Fluxxor.createStore({
     this.todos = [];
     this.todoTypes = [];
 
-    this.bindActions(actions.constants.TODO.LOAD_INITIAL, this.loadInitialData, actions.constants.TODO.LOAD, this.load, actions.constants.TODO.REMOVE, this.onRemove);
-  },
-
-  onRemove: function onRemove() {
-    this.emit("change");
+    this.bindActions(actions.constants.TODO.LOAD_INITIAL, this.loadInitialData, actions.constants.TODO.LOAD, this.load);
   },
 
   loadInitialData: function loadInitialData(data) {

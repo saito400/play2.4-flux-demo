@@ -4,8 +4,7 @@ var c = {
   TODO: {
     LOAD: "LOAD_TODO",
     LOAD_INITIAL: "LOAD_INITIAL_TODO",
-    ADD: "ADD_TODO",
-    REMOVE: "REMOVE_TODO"
+    ADD: "ADD_TODO"
   },
 
   TODO_TYPE: {
