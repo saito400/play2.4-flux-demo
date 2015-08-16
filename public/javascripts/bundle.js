@@ -411,14 +411,13 @@ var Todo = React.createClass({
     if (!confirm("delete with related todos?")) {
       return;
     }
-
     this.getFlux().actions.todoType.remove(React.findDOMNode(this.refs.tid).value);
   },
 
   render: function render() {
     return React.createElement(
       "tr",
-      { key: this.props.data.id },
+      null,
       React.createElement(
         "td",
         null,
@@ -450,7 +449,7 @@ var Todos = React.createClass({
 
   render: function render() {
     var items = this.props.data.map(function (x) {
-      return React.createElement(Todo, { data: x });
+      return React.createElement(Todo, { key: x.id, data: x });
     });
     return React.createElement(
       "tbody",
