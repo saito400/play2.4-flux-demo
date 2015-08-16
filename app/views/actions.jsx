@@ -3,7 +3,6 @@ require("whatwg-fetch");
 var c = {
   TODO: {
     LOAD: "LOAD_TODO",
-    LOAD_INITIAL: "LOAD_INITIAL_TODO",
     ADD: "ADD_TODO"
   },
 
@@ -31,22 +30,10 @@ var methods = {
           console.log('parsing failed', ex)
         })
     },
-    load_initial: function(){
-      fetch('/todotype/list')
-        .then(function(response) {
-          return response.json()
-        }).then(function(json) {
-          this.dispatch(c.TODO.LOAD_INITIAL, json);
-        }.bind(this)).catch(function(ex) {
-          console.log('error ', ex)
-        })
-    },
     remove: function(id) {
-
       var sendData = {
         id:id
       }
-
       fetch('/todo/delete', {
         method: 'post',
         headers: {
