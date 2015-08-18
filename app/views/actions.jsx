@@ -77,7 +77,7 @@ var methods = {
     },
     remove: function(id) {
       var sendData = {
-        id:id
+        id:parseInt(id)
       }
 
       fetch('/todotype/delete', {
