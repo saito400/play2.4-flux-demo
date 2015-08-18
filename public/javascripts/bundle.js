@@ -78,7 +78,7 @@ var methods = {
     },
     remove: function remove(id) {
       var sendData = {
-        id: id
+        id: parseInt(id)
       };
 
       fetch("/todotype/delete", {
@@ -403,10 +403,6 @@ var Todo = React.createClass({
 
   mixins: [FluxMixin],
 
-  getStateFromFlux: function getStateFromFlux() {
-    return this.getFlux().store("todoType").getState();
-  },
-
   "delete": function _delete() {
     if (!confirm("delete with related todos?")) {
       return;
@@ -441,11 +437,7 @@ var Todo = React.createClass({
 var Todos = React.createClass({
   displayName: "Todos",
 
-  mixins: [FluxMixin, StoreWatchMixin("todoType")],
-
-  getStateFromFlux: function getStateFromFlux() {
-    return this.getFlux().store("todoType").getState();
-  },
+  mixins: [FluxMixin],
 
   render: function render() {
     var items = this.props.data.map(function (x) {

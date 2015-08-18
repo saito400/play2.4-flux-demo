@@ -8,10 +8,6 @@ var React = require("react"),
 var Todo = React.createClass({
   mixins: [FluxMixin],
 
-  getStateFromFlux: function() {
-    return this.getFlux().store("todoType").getState();
-  },
-
   delete: function() {
     if(!confirm("delete with related todos?")){
       return;
@@ -34,11 +30,7 @@ var Todo = React.createClass({
 });
 
 var Todos = React.createClass({
-  mixins: [FluxMixin, StoreWatchMixin("todoType")],
-
-  getStateFromFlux: function() {
-    return this.getFlux().store("todoType").getState();
-  },
+  mixins: [FluxMixin],
 
   render: function() {
     var items = this.props.data.map(x => <Todo key={x.id} data={x} />);
