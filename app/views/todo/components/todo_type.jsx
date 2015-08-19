@@ -58,6 +58,8 @@ module.exports = React.createClass({
       title:this.refs.title.getDOMNode().value
     }
     this.getFlux().actions.todoType.add(sendData);
+
+   React.findDOMNode(this.refs.title).value = '';
   },
 
   render: function() {
