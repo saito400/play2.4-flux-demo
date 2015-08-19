@@ -313,6 +313,7 @@ module.exports = React.createClass({
       content: this.refs.content.getDOMNode().value
     };
     this.getFlux().actions.todo.add(sendData);
+    React.findDOMNode(this.refs.content).value = "";
   },
 
   updateOption: function updateOption(e) {
@@ -469,6 +470,8 @@ module.exports = React.createClass({
       title: this.refs.title.getDOMNode().value
     };
     this.getFlux().actions.todoType.add(sendData);
+
+    React.findDOMNode(this.refs.title).value = "";
   },
 
   render: function render() {

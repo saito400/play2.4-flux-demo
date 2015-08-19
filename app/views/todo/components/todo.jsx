@@ -43,6 +43,7 @@ module.exports = React.createClass({
       content: this.refs.content.getDOMNode().value
     }
     this.getFlux().actions.todo.add(sendData);
+   React.findDOMNode(this.refs.content).value = '';
   },
 
   updateOption: function(e) {
